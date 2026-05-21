@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2008/01/reportdefinition"
+        xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <Body>
+    <ReportItems>
+      <Textbox Name="textbox1">
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>Profit Trend</Value>
+              </TextRun>
+            </TextRuns>
+          </Paragraph>
+        </Paragraphs>
+        <Top>0.5in</Top>
+        <Left>0.5in</Left>
+      </Textbox>
+    </ReportItems>
+    <Height>2in</Height>
+  </Body>
+  <Width>6in</Width>
+  <Page>
+    <PageHeight>11in</PageHeight>
+    <PageWidth>8.5in</PageWidth>
+    <LeftMargin>0.5in</LeftMargin>
+    <RightMargin>0.5in</RightMargin>
+    <TopMargin>0.5in</TopMargin>
+    <BottomMargin>0.5in</BottomMargin>
+  </Page>
+  <DataSets>
+    <DataSet Name="ProfitTrend">
+      <Query>
+        <DataSourceName>DataSource1</DataSourceName>
+      </Query>
+      <Fields>
+        <Field Name="TxYear"><DataField>TxYear</DataField><rd:TypeName>System.Int32</rd:TypeName></Field>
+        <Field Name="TxMonth"><DataField>TxMonth</DataField><rd:TypeName>System.Int32</rd:TypeName></Field>
+        <Field Name="MonthName"><DataField>MonthName</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+        <Field Name="Revenue"><DataField>Revenue</DataField><rd:TypeName>System.Decimal</rd:TypeName></Field>
+        <Field Name="Transactions"><DataField>Transactions</DataField><rd:TypeName>System.Int32</rd:TypeName></Field>
+      </Fields>
+    </DataSet>
+  </DataSets>
+  <DataSources>
+    <DataSource Name="DataSource1">
+      <ConnectionProperties>
+        <ConnectString />
+        <DataProvider>SQL</DataProvider>
+      </ConnectionProperties>
+      <rd:DataSourceID>12345678-1234-1234-1234-123456789012</rd:DataSourceID>
+    </DataSource>
+  </DataSources>
+  <rd:ReportID>33333333-3333-3333-3333-333333333333</rd:ReportID>
+  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+</Report>
