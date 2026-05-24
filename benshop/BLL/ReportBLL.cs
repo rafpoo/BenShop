@@ -99,6 +99,65 @@ namespace benshop.BLL
             }
         }
 
+        public static DataTable GetReportSummary(DateTime startDate, DateTime endDate)
+        {
+            DataTable dt = new DataTable();
+            using (SqlConnection conn = DBHelper.GetConnection())
+            {
+                string query = @"
+                    SELECT
+                        COUNT(*) AS TotalTransactions,
+                        ISNULL(SUM(Subtotal), 0) AS TotalSubtotal,
+                        ISNULL(SUM(DiscountAmount), 0) AS TotalDiscount,
+                        ISNULL(SUM(Total), 0) AS TotalRevenue,
+                        ISNULL(AVG(Total), 0) AS AverageTransaction
+                    FROM Transactions
+                    WHERE CreatedAt >= @StartDate
+                      AND CreatedAt < @EndDate
+                      AND ISNULL(Status, '') <> 'Dibatalkan'";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    AddDateRangeParameters(cmd, startDate, endDate);
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                    {
+                        adapter.Fill(dt);
+                    }
+                }
+            }
+            return dt;
+        }
+
+        public static DataSet GetTransactionSummary(DateTime startDate, DateTime endDate)
+        {
+            string query = @"
+                SELECT
+                    CAST(CreatedAt AS DATE) AS TxDate,
+                    DATENAME(MONTH, CreatedAt) AS MonthName,
+                    YEAR(CreatedAt) AS TxYear,
+                    COUNT(*) AS TotalTransactions,
+                    SUM(Subtotal) AS TotalSubtotal,
+                    SUM(DiscountAmount) AS TotalDiscount,
+                    SUM(Total) AS TotalRevenue
+                FROM Transactions
+                WHERE CreatedAt >= @StartDate
+                  AND CreatedAt < @EndDate
+                  AND ISNULL(Status, '') <> 'Dibatalkan'
+                GROUP BY CAST(CreatedAt AS DATE), DATENAME(MONTH, CreatedAt), YEAR(CreatedAt)
+                ORDER BY TxDate";
+
+            using (SqlConnection conn = DBHelper.GetConnection())
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                AddDateRangeParameters(cmd, startDate, endDate);
+                using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                {
+                    DataSet ds = new DataSet();
+                    adapter.Fill(ds, "TransactionSummary");
+                    return ds;
+                }
+            }
+        }
+
         public static DataTable GetTopProductsData()
         {
             DataTable dt = new DataTable();
@@ -115,6 +174,33 @@ namespace benshop.BLL
                 using (SqlDataAdapter adapter = new SqlDataAdapter(query, conn))
                 {
                     adapter.Fill(dt);
+                }
+            }
+            return dt;
+        }
+
+        public static DataTable GetTopProductsData(DateTime startDate, DateTime endDate)
+        {
+            DataTable dt = new DataTable();
+            using (SqlConnection conn = DBHelper.GetConnection())
+            {
+                string query = @"
+                    SELECT p.Name, p.Category, SUM(td.Quantity) AS TotalSold, SUM(td.Subtotal) AS TotalRevenue
+                    FROM TransactionDetails td
+                    JOIN Products p ON td.ProductID = p.ProductID
+                    JOIN Transactions t ON td.TransactionID = t.TransactionID
+                    WHERE t.CreatedAt >= @StartDate
+                      AND t.CreatedAt < @EndDate
+                      AND ISNULL(t.Status, '') <> 'Dibatalkan'
+                    GROUP BY p.Name, p.Category
+                    ORDER BY TotalSold DESC";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    AddDateRangeParameters(cmd, startDate, endDate);
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                    {
+                        adapter.Fill(dt);
+                    }
                 }
             }
             return dt;
@@ -142,6 +228,74 @@ namespace benshop.BLL
                 }
             }
             return dt;
+        }
+
+        public static DataTable GetRevenueTrend(DateTime startDate, DateTime endDate)
+        {
+            DataTable dt = new DataTable();
+            using (SqlConnection conn = DBHelper.GetConnection())
+            {
+                string query = @"
+                    SELECT
+                        YEAR(CreatedAt) AS TxYear,
+                        MONTH(CreatedAt) AS TxMonth,
+                        DATENAME(MONTH, CreatedAt) AS MonthName,
+                        SUM(Total) AS Revenue,
+                        COUNT(*) AS Transactions
+                    FROM Transactions
+                    WHERE CreatedAt >= @StartDate
+                      AND CreatedAt < @EndDate
+                      AND ISNULL(Status, '') <> 'Dibatalkan'
+                    GROUP BY YEAR(CreatedAt), MONTH(CreatedAt), DATENAME(MONTH, CreatedAt)
+                    ORDER BY TxYear, TxMonth";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    AddDateRangeParameters(cmd, startDate, endDate);
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                    {
+                        adapter.Fill(dt);
+                    }
+                }
+            }
+            return dt;
+        }
+
+        public static DataTable GetPromoUsage(DateTime startDate, DateTime endDate)
+        {
+            DataTable dt = new DataTable();
+            using (SqlConnection conn = DBHelper.GetConnection())
+            {
+                string query = @"
+                    SELECT
+                        p.Code,
+                        p.DiscountType,
+                        p.DiscountVal,
+                        COUNT(t.TransactionID) AS UsageCount,
+                        ISNULL(SUM(t.DiscountAmount), 0) AS TotalDiscount,
+                        ISNULL(SUM(t.Total), 0) AS TotalRevenue
+                    FROM Transactions t
+                    JOIN PromoCodes p ON t.PromoID = p.PromoID
+                    WHERE t.CreatedAt >= @StartDate
+                      AND t.CreatedAt < @EndDate
+                      AND ISNULL(t.Status, '') <> 'Dibatalkan'
+                    GROUP BY p.Code, p.DiscountType, p.DiscountVal
+                    ORDER BY UsageCount DESC, TotalRevenue DESC";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    AddDateRangeParameters(cmd, startDate, endDate);
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                    {
+                        adapter.Fill(dt);
+                    }
+                }
+            }
+            return dt;
+        }
+
+        private static void AddDateRangeParameters(SqlCommand cmd, DateTime startDate, DateTime endDate)
+        {
+            cmd.Parameters.Add("@StartDate", SqlDbType.DateTime).Value = startDate.Date;
+            cmd.Parameters.Add("@EndDate", SqlDbType.DateTime).Value = endDate.Date.AddDays(1);
         }
 
         private static string BuildTransactionSummaryQuery(string periodWhere)

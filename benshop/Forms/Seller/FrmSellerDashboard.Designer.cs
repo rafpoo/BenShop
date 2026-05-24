@@ -11,6 +11,7 @@ namespace benshop.Forms.Seller
         private Panel pnlContent;
         private Panel pnlStats;
         private Label lblAppName;
+        private Label lblGreeting;
         private Button btnProducts;
         private Button btnPromo;
         private Button btnReport;
@@ -39,6 +40,7 @@ namespace benshop.Forms.Seller
             this.pnlContent = new Panel();
             this.pnlStats = new Panel();
             this.lblAppName = new Label();
+            this.lblGreeting = new Label();
             this.btnProducts = new Button();
             this.btnPromo = new Button();
             this.btnReport = new Button();
@@ -53,6 +55,7 @@ namespace benshop.Forms.Seller
             this.dgvRecentTransactions = new DataGridView();
             this.btnRefresh = new Button();
             this.pnlSidebar.SuspendLayout();
+            this.pnlTop.SuspendLayout();
             this.pnlContent.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)this.dgvTopProducts).BeginInit();
             ((System.ComponentModel.ISupportInitialize)this.dgvRecentTransactions).BeginInit();
@@ -133,7 +136,15 @@ namespace benshop.Forms.Seller
             // pnlTop
             this.pnlTop.BackColor = Color.White;
             this.pnlTop.Dock = DockStyle.Top;
-            this.pnlTop.Size = new Size(980, 20);
+            this.pnlTop.Size = new Size(980, 72);
+
+            this.lblGreeting.AutoSize = true;
+            this.lblGreeting.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            this.lblGreeting.Font = new Font("Segoe UI", 12, FontStyle.Bold);
+            this.lblGreeting.ForeColor = Color.FromArgb(30, 41, 59);
+            this.lblGreeting.Text = "Halo";
+            this.lblGreeting.Location = new Point(820, 25);
+            this.pnlTop.Controls.Add(this.lblGreeting);
 
             // pnlContent
             this.pnlContent.BackColor = Color.FromArgb(248, 250, 252);
@@ -245,6 +256,8 @@ namespace benshop.Forms.Seller
             this.Controls.Add(this.pnlContent);
             this.Controls.Add(this.pnlTop);
             this.Controls.Add(this.pnlSidebar);
+            this.pnlTop.ResumeLayout(false);
+            this.pnlTop.PerformLayout();
             this.pnlSidebar.ResumeLayout(false);
             this.pnlSidebar.PerformLayout();
             this.pnlContent.ResumeLayout(false);

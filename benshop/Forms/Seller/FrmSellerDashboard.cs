@@ -8,14 +8,91 @@ namespace benshop.Forms.Seller
 {
     public partial class FrmSellerDashboard : Form
     {
+        private Label _topProductsTitle;
+        private Label _recentTransactionsTitle;
+        private Label _recentTransactionsHint;
+
         public FrmSellerDashboard()
         {
             InitializeComponent();
+            ApplyModernTheme();
             pnlContent.Resize += (sender, args) => ArrangeDashboard();
             ArrangeDashboard();
             LoadStats();
             LoadTopProducts();
             LoadRecentTransactions();
+        }
+
+        private void ApplyModernTheme()
+        {
+            UiHelper.ApplyForm(this, new Size(1100, 700));
+            pnlSidebar.BackColor = UiHelper.Navy;
+            pnlTop.BackColor = Color.White;
+            pnlContent.BackColor = UiHelper.Page;
+            UiHelper.ApplySection(pnlStats);
+
+            lblAppName.Text = "BenShop";
+            lblAppName.Font = UiHelper.Font(20, FontStyle.Bold);
+            lblAppName.ForeColor = Color.White;
+            lblAppName.Location = new Point(28, 28);
+
+            lblGreeting.Text = string.Format("Halo, {0}", GetGreetingName());
+            lblGreeting.Font = UiHelper.Font(12, FontStyle.Bold);
+            lblGreeting.ForeColor = UiHelper.Text;
+            lblGreeting.AutoSize = true;
+            pnlTop.Resize += (sender, args) => PositionGreeting(lblGreeting, pnlTop);
+            PositionGreeting(lblGreeting, pnlTop);
+
+            UiHelper.ApplySideButton(btnProducts);
+            UiHelper.ApplySideButton(btnPromo);
+            UiHelper.ApplySideButton(btnReport);
+            UiHelper.ApplySideButton(btnLogout);
+            btnProducts.Text = "   Produk";
+            btnPromo.Text = "   Promo";
+            btnReport.Text = "   Laporan";
+            btnLogout.Text = "   Keluar";
+            btnLogout.ForeColor = Color.FromArgb(252, 165, 165);
+
+            UiHelper.ApplyGrid(dgvTopProducts);
+            UiHelper.ApplyGrid(dgvRecentTransactions);
+            UiHelper.ApplyButton(btnRefresh, ButtonKind.Primary);
+
+            lblTotalProducts.Font = UiHelper.Font(10, FontStyle.Bold);
+            lblTotalTransactions.Font = UiHelper.Font(10, FontStyle.Bold);
+            lblRevenueToday.Font = UiHelper.Font(10, FontStyle.Bold);
+            lblTotalProducts.ForeColor = UiHelper.Muted;
+            lblTotalTransactions.ForeColor = UiHelper.Muted;
+            lblRevenueToday.ForeColor = UiHelper.Muted;
+            lblTotalProductsValue.Font = UiHelper.Font(24, FontStyle.Bold);
+            lblTotalTransactionsValue.Font = UiHelper.Font(24, FontStyle.Bold);
+            lblRevenueTodayValue.Font = UiHelper.Font(24, FontStyle.Bold);
+
+            _topProductsTitle = UiHelper.SectionTitle("Produk Terlaris");
+            _recentTransactionsTitle = UiHelper.SectionTitle("Transaksi Terbaru");
+            _recentTransactionsHint = UiHelper.SectionHint("Double-click transaksi untuk mengubah status.");
+            pnlContent.Controls.Add(_topProductsTitle);
+            pnlContent.Controls.Add(_recentTransactionsTitle);
+            pnlContent.Controls.Add(_recentTransactionsHint);
+        }
+
+        private static string GetGreetingName()
+        {
+            if (SessionManager.CurrentUser == null)
+                return "Pengguna";
+
+            string fullName = SessionManager.CurrentUser.FullName;
+            if (string.IsNullOrWhiteSpace(fullName))
+                fullName = SessionManager.CurrentUser.Username;
+
+            if (string.IsNullOrWhiteSpace(fullName))
+                return "Pengguna";
+
+            return fullName.Trim().Split(' ')[0];
+        }
+
+        private static void PositionGreeting(Label label, Panel panel)
+        {
+            label.Location = new Point(Math.Max(24, panel.ClientSize.Width - label.Width - 28), 25);
         }
 
         private void ArrangeDashboard()
@@ -38,7 +115,12 @@ namespace benshop.Forms.Seller
             PositionStat(lblTotalTransactions, lblTotalTransactionsValue, 24 + statColumnWidth, statColumnWidth);
             PositionStat(lblRevenueToday, lblRevenueTodayValue, 24 + (statColumnWidth * 2), statColumnWidth);
 
-            int tablesTop = pnlStats.Bottom + gap;
+            int titlesTop = pnlStats.Bottom + gap;
+            _topProductsTitle.Location = new Point(padding, titlesTop);
+            _recentTransactionsTitle.Location = new Point(padding + ((contentWidth - gap) / 2) + gap, titlesTop);
+            _recentTransactionsHint.Location = new Point(_recentTransactionsTitle.Left, titlesTop + 24);
+
+            int tablesTop = titlesTop + 52;
             int refreshTop = pnlContent.ClientSize.Height - padding - refreshHeight;
             int tableHeight = Math.Max(220, refreshTop - gap - tablesTop);
             int tableWidth = (contentWidth - gap) / 2;

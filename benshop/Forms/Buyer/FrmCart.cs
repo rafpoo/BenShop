@@ -10,7 +10,34 @@ namespace benshop.Forms.Buyer
         public FrmCart()
         {
             InitializeComponent();
+            ApplyModernTheme();
+            Resize += (sender, args) => ArrangeCart();
+            ArrangeCart();
             LoadCart();
+        }
+
+        private void ApplyModernTheme()
+        {
+            UiHelper.ApplyForm(this, new Size(800, 550));
+            UiHelper.ApplyHeader(pnlTop, lblTitle, "Keranjang Belanja");
+            UiHelper.ApplyGrid(dgvCart);
+            pnlBottom.BackColor = Color.White;
+            UiHelper.ApplyButton(btnIncrease, ButtonKind.Secondary);
+            UiHelper.ApplyButton(btnDecrease, ButtonKind.Secondary);
+            UiHelper.ApplyButton(btnRemove, ButtonKind.Danger);
+            UiHelper.ApplyButton(btnClose, ButtonKind.Secondary);
+            UiHelper.ApplyButton(btnCheckout, ButtonKind.Primary);
+            lblTotal.Font = UiHelper.Font(18, FontStyle.Bold);
+            lblTotal.ForeColor = UiHelper.Teal;
+        }
+
+        private void ArrangeCart()
+        {
+            int padding = 24;
+            dgvCart.Location = new Point(padding, pnlTop.Bottom + 20);
+            dgvCart.Size = new Size(ClientSize.Width - (padding * 2), ClientSize.Height - pnlTop.Height - pnlBottom.Height - 44);
+            btnCheckout.Location = new Point(pnlBottom.Width - 220, 58);
+            btnClose.Location = new Point(btnCheckout.Left - 100, 58);
         }
 
         private void LoadCart()

@@ -41,6 +41,26 @@ namespace benshop.DAL
             }
         }
 
+        public static bool PromoCodeExists(string code, int? excludePromoId = null)
+        {
+            using (SqlConnection conn = DBHelper.GetConnection())
+            {
+                string query = @"SELECT COUNT(1)
+                                 FROM PromoCodes
+                                 WHERE UPPER(Code) = UPPER(@Code)
+                                   AND (@ExcludePromoID IS NULL OR PromoID <> @ExcludePromoID)";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Code", code);
+                    cmd.Parameters.Add("@ExcludePromoID", SqlDbType.Int).Value = excludePromoId.HasValue
+                        ? (object)excludePromoId.Value
+                        : DBNull.Value;
+                    conn.Open();
+                    return Convert.ToInt32(cmd.ExecuteScalar()) > 0;
+                }
+            }
+        }
+
         public static void UpdatePromo(int promoId, string code, string discountType, decimal discountVal,
             DateTime validFrom, DateTime validUntil, bool isActive)
         {

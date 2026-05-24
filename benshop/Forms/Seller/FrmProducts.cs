@@ -10,7 +10,41 @@ namespace benshop.Forms.Seller
         public FrmProducts()
         {
             InitializeComponent();
+            ApplyModernTheme();
+            Resize += (sender, args) => ArrangeProductForm();
+            ArrangeProductForm();
             LoadProducts();
+        }
+
+        private void ApplyModernTheme()
+        {
+            Helpers.UiHelper.ApplyForm(this, new Size(1000, 650));
+            Helpers.UiHelper.ApplyHeader(pnlTop, lblTitle, "Manajemen Produk");
+            Helpers.UiHelper.ApplyGrid(dgvProducts);
+            Helpers.UiHelper.ApplySection(pnlForm);
+
+            foreach (Control control in new Control[] { txtName, txtCategory, nudPrice, nudStock })
+                Helpers.UiHelper.ApplyInput(control);
+
+            Helpers.UiHelper.ApplyButton(btnAdd, Helpers.ButtonKind.Primary);
+            Helpers.UiHelper.ApplyButton(btnEdit, Helpers.ButtonKind.Info);
+            Helpers.UiHelper.ApplyButton(btnDelete, Helpers.ButtonKind.Danger);
+            Helpers.UiHelper.ApplyButton(btnClose, Helpers.ButtonKind.Secondary);
+        }
+
+        private void ArrangeProductForm()
+        {
+            int padding = 24;
+            int width = ClientSize.Width - (padding * 2);
+            int top = pnlTop.Bottom + 20;
+
+            dgvProducts.Location = new Point(padding, top);
+            dgvProducts.Size = new Size(width, Math.Max(260, ClientSize.Height - top - 260));
+
+            pnlForm.Location = new Point(padding, dgvProducts.Bottom + 18);
+            pnlForm.Size = new Size(width, 190);
+
+            btnClose.Location = new Point(pnlForm.Width - 130, 90);
         }
 
         private void LoadProducts()
@@ -19,6 +53,12 @@ namespace benshop.Forms.Seller
             {
                 DataTable dt = BLL.ProductBLL.GetAllProducts();
                 dgvProducts.DataSource = dt;
+                if (dgvProducts.Columns["ProductID"] != null)
+                    dgvProducts.Columns["ProductID"].Visible = false;
+                if (dgvProducts.Columns["ImagePath"] != null)
+                    dgvProducts.Columns["ImagePath"].Visible = false;
+                if (dgvProducts.Columns["CreatedAt"] != null)
+                    dgvProducts.Columns["CreatedAt"].Visible = false;
             }
             catch (Exception ex)
             {

@@ -9,12 +9,93 @@ namespace benshop.Forms.Buyer
     public partial class FrmBuyerDashboard : Form
     {
         private DataView _productView;
+        private Label _pageTitle;
+        private Label _pageHint;
 
         public FrmBuyerDashboard()
         {
             InitializeComponent();
+            ApplyModernTheme();
+            pnlContent.Resize += (sender, args) => ArrangeBuyerDashboard();
+            ArrangeBuyerDashboard();
             LoadCategories();
             LoadProducts();
+        }
+
+        private void ApplyModernTheme()
+        {
+            UiHelper.ApplyForm(this, new Size(1100, 700));
+            pnlSidebar.BackColor = UiHelper.Navy;
+            pnlTop.BackColor = Color.White;
+            pnlContent.BackColor = UiHelper.Page;
+
+            lblAppName.Text = "BenShop";
+            lblAppName.Font = UiHelper.Font(20, FontStyle.Bold);
+            lblAppName.ForeColor = Color.White;
+            lblAppName.Location = new Point(28, 28);
+
+            lblGreeting.Text = string.Format("Halo, {0}", GetGreetingName());
+            lblGreeting.Font = UiHelper.Font(12, FontStyle.Bold);
+            lblGreeting.ForeColor = UiHelper.Text;
+            lblGreeting.AutoSize = true;
+            pnlTop.Resize += (sender, args) => PositionGreeting(lblGreeting, pnlTop);
+            PositionGreeting(lblGreeting, pnlTop);
+
+            UiHelper.ApplySideButton(btnCart);
+            UiHelper.ApplySideButton(btnHistory);
+            UiHelper.ApplySideButton(btnLogout);
+            btnCart.Text = "   Keranjang";
+            btnHistory.Text = "   Riwayat";
+            btnLogout.Text = "   Keluar";
+            btnLogout.ForeColor = Color.FromArgb(252, 165, 165);
+
+            //lblSearch.Text = "Cari produk";
+            lblSearch.Font = UiHelper.Font(10, FontStyle.Bold);
+            lblSearch.ForeColor = UiHelper.Text;
+            UiHelper.ApplyInput(txtSearch);
+            UiHelper.ApplyInput(cboCategory);
+
+            UiHelper.ApplyGrid(dgvProducts);
+
+            _pageTitle = UiHelper.SectionTitle("Katalog Produk");
+            _pageTitle.Font = UiHelper.Font(18, FontStyle.Bold);
+            _pageHint = UiHelper.SectionHint("Cari produk, pilih kategori, lalu tambahkan ke keranjang.");
+            pnlContent.Controls.Add(_pageTitle);
+            pnlContent.Controls.Add(_pageHint);
+        }
+
+        private static string GetGreetingName()
+        {
+            if (SessionManager.CurrentUser == null)
+                return "Pengguna";
+
+            string fullName = SessionManager.CurrentUser.FullName;
+            if (string.IsNullOrWhiteSpace(fullName))
+                fullName = SessionManager.CurrentUser.Username;
+
+            if (string.IsNullOrWhiteSpace(fullName))
+                return "Pengguna";
+
+            return fullName.Trim().Split(' ')[0];
+        }
+
+        private static void PositionGreeting(Label label, Panel panel)
+        {
+            label.Location = new Point(Math.Max(24, panel.ClientSize.Width - label.Width - 28), 28);
+        }
+
+        private void ArrangeBuyerDashboard()
+        {
+            int padding = 24;
+            int width = pnlContent.ClientSize.Width - (padding * 2);
+            int height = pnlContent.ClientSize.Height - (padding * 2);
+            if (width <= 0 || height <= 0) return;
+
+            _pageTitle.Location = new Point(padding, padding);
+            _pageHint.Location = new Point(padding, padding + 34);
+
+            dgvProducts.Location = new Point(padding, padding + 82);
+            dgvProducts.Size = new Size(width, Math.Max(260, height - 82));
         }
 
         private void LoadCategories()
@@ -39,6 +120,7 @@ namespace benshop.Forms.Buyer
                 _productView = dt.DefaultView;
                 dgvProducts.DataSource = _productView;
                 ConfigureColumns();
+                ConfigureProductGrid();
                 ApplyFilter();
             }
             catch (Exception ex)
@@ -71,6 +153,27 @@ namespace benshop.Forms.Buyer
             btnCol.DefaultCellStyle.ForeColor = Color.White;
             btnCol.DefaultCellStyle.Font = new Font("Segoe UI", 9, FontStyle.Bold);
             dgvProducts.Columns.Add(btnCol);
+            ConfigureProductGrid();
+        }
+
+        private void ConfigureProductGrid()
+        {
+            if (dgvProducts.Columns["ProductID"] != null)
+                dgvProducts.Columns["ProductID"].Visible = false;
+            if (dgvProducts.Columns["ImagePath"] != null)
+                dgvProducts.Columns["ImagePath"].Visible = false;
+            if (dgvProducts.Columns["IsActive"] != null)
+                dgvProducts.Columns["IsActive"].Visible = false;
+            if (dgvProducts.Columns["CreatedAt"] != null)
+                dgvProducts.Columns["CreatedAt"].Visible = false;
+            if (dgvProducts.Columns["Name"] != null)
+                dgvProducts.Columns["Name"].HeaderText = "Nama Produk";
+            if (dgvProducts.Columns["Category"] != null)
+                dgvProducts.Columns["Category"].HeaderText = "Kategori";
+            if (dgvProducts.Columns["Price"] != null)
+                dgvProducts.Columns["Price"].HeaderText = "Harga";
+            if (dgvProducts.Columns["Stock"] != null)
+                dgvProducts.Columns["Stock"].HeaderText = "Stok";
         }
 
         private void ApplyFilter()

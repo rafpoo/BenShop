@@ -10,6 +10,7 @@ namespace benshop.Forms.Buyer
         private Panel pnlSidebar;
         private Panel pnlContent;
         private Label lblAppName;
+        private Label lblGreeting;
         private Button btnLogout;
         private Button btnCart;
         private Button btnHistory;
@@ -31,6 +32,7 @@ namespace benshop.Forms.Buyer
             this.pnlSidebar = new Panel();
             this.pnlContent = new Panel();
             this.lblAppName = new Label();
+            this.lblGreeting = new Label();
             this.btnLogout = new Button();
             this.btnCart = new Button();
             this.btnHistory = new Button();
@@ -130,9 +132,17 @@ namespace benshop.Forms.Buyer
             this.cboCategory.BackColor = Color.FromArgb(248, 250, 252);
             this.cboCategory.SelectedIndexChanged += new System.EventHandler(this.cboCategory_SelectedIndexChanged);
 
+            this.lblGreeting.AutoSize = true;
+            this.lblGreeting.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            this.lblGreeting.Font = new Font("Segoe UI", 12, FontStyle.Bold);
+            this.lblGreeting.ForeColor = Color.FromArgb(30, 41, 59);
+            this.lblGreeting.Text = "Halo";
+            this.lblGreeting.Location = new Point(820, 28);
+
             this.pnlTop.Controls.Add(this.lblSearch);
             this.pnlTop.Controls.Add(this.txtSearch);
             this.pnlTop.Controls.Add(this.cboCategory);
+            this.pnlTop.Controls.Add(this.lblGreeting);
 
             // pnlContent
             this.pnlContent.BackColor = Color.FromArgb(248, 250, 252);

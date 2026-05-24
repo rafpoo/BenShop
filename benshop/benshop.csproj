@@ -147,6 +147,7 @@
     <Compile Include="Helpers\FormatHelper.cs" />
     <Compile Include="Helpers\ReportHelper.cs" />
     <Compile Include="Helpers\SessionManager.cs" />
+    <Compile Include="Helpers\UiHelper.cs" />
     <Compile Include="Helpers\ValidationHelper.cs" />
     <Compile Include="Models\CartItem.cs" />
     <Compile Include="Models\Product.cs" />

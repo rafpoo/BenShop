@@ -10,7 +10,37 @@ namespace benshop.Forms.Buyer
         public FrmCheckout()
         {
             InitializeComponent();
+            ApplyModernTheme();
             LoadSummary();
+        }
+
+        private void ApplyModernTheme()
+        {
+            UiHelper.ApplyForm(this, new Size(700, 620));
+            UiHelper.ApplyHeader(pnlTop, lblTitle, "Checkout Pesanan");
+
+            foreach (Control control in new Control[] { txtRecipient, txtPhone, txtAddress, cboPayment, txtPromo })
+                UiHelper.ApplyInput(control);
+
+            foreach (Label label in new Label[] { lblRecipient, lblPhone, lblAddress, lblPayment, lblPromo })
+            {
+                label.Font = UiHelper.Font(10, FontStyle.Bold);
+                label.ForeColor = UiHelper.Text;
+            }
+
+            UiHelper.ApplyButton(btnApplyPromo, ButtonKind.Info);
+            UiHelper.ApplyButton(btnConfirm, ButtonKind.Primary);
+            UiHelper.ApplyButton(btnCancel, ButtonKind.Secondary);
+            btnApplyPromo.Text = "Terapkan";
+            btnConfirm.Text = "Konfirmasi Pesanan";
+
+            foreach (Label label in new Label[] { lblSubtotal, lblDiscount, lblTotal })
+            {
+                label.ForeColor = UiHelper.Text;
+                label.TextAlign = ContentAlignment.MiddleLeft;
+            }
+            foreach (Label label in new Label[] { lblSubtotalValue, lblDiscountValue, lblTotalValue })
+                label.TextAlign = ContentAlignment.MiddleRight;
         }
 
         private void LoadSummary()
@@ -20,9 +50,9 @@ namespace benshop.Forms.Buyer
             decimal discount = BLL.CartBLL.GetDiscount();
             decimal total = subtotal - discount;
 
-            lblSubtotal.Text = FormatHelper.ToRupiah(subtotal);
-            lblDiscount.Text = FormatHelper.ToRupiah(discount);
-            lblTotal.Text = FormatHelper.ToRupiah(total);
+            lblSubtotalValue.Text = FormatHelper.ToRupiah(subtotal);
+            lblDiscountValue.Text = FormatHelper.ToRupiah(discount);
+            lblTotalValue.Text = FormatHelper.ToRupiah(total);
         }
 
         private void btnApplyPromo_Click(object sender, EventArgs e)
